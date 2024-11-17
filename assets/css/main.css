@@ -1,0 +1,38 @@
+html {
+    font-family: system-ui;
+    font-size: 28px;
+}
+
+body {
+    text-align: center;
+    max-width: 1000px;
+    margin: auto;
+    font-size: calc(100% * var(--scale, 1));
+    --component-padding: calc(20px * var(--scale, 1));
+    --component-border-radius: 15px;
+    --component-border-color: #7c7c7c;
+    --component-outline-focus-color: #818ab9;
+    --component-placeholder-color: #949494;
+    --component-error-color: #ea2500;
+}
+
+.bry__simpleequation {
+    --placeholder: "Введите уравнение";
+    --notice-error: "Уравнение содержит ошибку";
+    
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto; 
+}
+
+@media only screen and (max-width: 1000px) {   
+    body {
+        --scale: 0.7;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    body {
+        --scale: 0.5;
+    }    
+}
