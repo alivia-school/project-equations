@@ -1,5 +1,5 @@
 __BRYTHON__.use_VFS = true;
-var scripts = {"$timestamp": 1731012885398, "Equation": [".py", "from browser import window\nfrom core import Object\n\nclass Equation(Object):\n def __init__(self,value):\n  super().__init__(value)\n  \n  \nEquationComponentType=window.EquationComponentType\n\n\n\n", ["browser", "core"]], "SimpleEquationComponent": [".py", "from browser import window\nfrom core import Component\n\nclass SimpleEquation(Component):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["browser", "core"]]}
+var scripts = {"$timestamp": 1731862495168, "Equation": [".py", "from browser import window\nfrom core import Object\n\nclass Equation(Object):\n def __init__(self,value):\n  super().__init__(value)\n  \n  \nEquationComponentType=window.EquationComponentType\n\n\n\n", ["browser", "core"]], "SimpleEquationComponent": [".py", "from browser import window\nfrom core import Component\n\nclass SimpleEquation(Component):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["browser", "core"]]}
 __BRYTHON__.update_VFS(scripts)
 ;
 (function(){const __$tmp = document.createElement("style");__$tmp.textContent = `
@@ -32,7 +32,7 @@ __BRYTHON__.update_VFS(scripts)
 .bry__simpleequation .property_text:empty::before {
    content: var(--placeholder);
    color: var(--component-placeholder-color);
-   font-size: 70%;
+   font-size: 90%;
 }    
 
 .bry__simpleequation.error .property_input {
@@ -151,102 +151,105 @@ class Equation  {
         var val = this.value.replace(/ /g,'');
         var components = []
         
-        let collected = {
-                cur_number: '',
-                eqs: 0,
-                Parenthesess: 0,
-            }
-            
-        function checkNumber() {
-            if (collected.cur_number !== '') {
-                components.push(new EquationComponent(parseInt(collected.cur_number)));
-                collected.cur_number = '';                     
-            }                    
-        }                
+        if (val != "") {
         
-        for (let i = 0; i < val.length && !error; i++) {
-            let c = val[i];
+            let collected = {
+                    cur_number: '',
+                    cur_x: undefined,
+                    eqs: 0,
+                    Parenthesess: 0,
+                }
+                
+            function checkNumber() {
+                if (collected.cur_number !== '') {
+                    components.push(new EquationComponent(parseInt(collected.cur_number)));
+                    collected.cur_number = '';                     
+                }                    
+            }                
             
-            if (c >= '0' && c <= '9') {
-                collected.cur_number += c; 
-                continue;
+            for (let i = 0; i < val.length && !error; i++) {
+                let c = val[i];
+                
+                if (c >= '0' && c <= '9') {
+                    collected.cur_number += c; 
+                    continue;
+                }
+                checkNumber()
+
+                if ((c > 'a' && c < 'z') || (c > 'A' && c < 'Z')) {
+                    if ( !collected.cur_x ) 
+                        collected.cur_x = c; 
+                    else if ( collected.cur_x != c)
+                        error = true                
+                    components.push(new EquationComponent(c));
+                    continue;
+                }
+                
+                switch (c) {
+                                        
+                    case '=':
+                        collected.eqs++;
+                        if (collected.Parenthesess!=0)
+                            error = true
+                        break;
+                        
+                    case '(':
+                        collected.Parenthesess++;
+                        break
+                        
+                    case ')':
+                        collected.Parenthesess--;
+                        break;
+                        
+                    case '+':
+                    case '-':
+                        break;                    
+                        
+                    default:
+                        error = true
+                }
+                
+                if (collected.Parenthesess>1)
+                    error = true 
+                    
+                if (!error)
+                    components.push(new EquationComponent(c));
+                else
+                    break
+
             }
             checkNumber()
-
-            if ((c > 'a' && c < 'z') || (c > 'A' && c < 'Z')) {
-                if ( !collected.cur_x ) 
-                    collected.cur_x = c; 
-                else if ( collected.cur_x != c)
-                    error = true                
-                components.push(new EquationComponent(c));
-                continue;
-            }
             
-            switch (c) {
-                                    
-                case '=':
-                    collected.eqs++;
-                    if (collected.Parenthesess!=0)
-                        error = true
-                    break;
-                    
-                case '(':
-                    collected.Parenthesess++;
-                    break
-                    
-                case ')':
-                    collected.Parenthesess--;
-                    break;
-                    
-                case '+':
-                case '-':
-                    break;                    
-                    
-                default:
-                    error = true
-            }
-            
-            if (collected.Parenthesess>1)
+            if (collected.eqs!=1 || collected.Parenthesess!=0 || !collected.cur_x)
                 error = true 
-                
-            if (!error)
-                components.push(new EquationComponent(c));
-            else
-                break
-
-        }
-        checkNumber()
-        
-        if (collected.eqs!=1 || collected.Parenthesess!=0)
-            error = true 
-        
-        this.components = components.slice(0);
-        
-        components.unshift(new EquationComponent(''));        
-        components.push(new EquationComponent(''));  
-        for (let i = 1; i < components.length-1 && !error; i++) {
-            let value = components[i].value;
-            let type = components[i].type;
             
-            switch (type) {
-                case EquationComponentType.Operation:
-                    error = !(   [...(value=='-' ? [EquationComponentType.Empty, EquationComponentType.Equal] : []), EquationComponentType.Number, EquationComponentType.Parentheses, EquationComponentType.Unknown].includes(components[i-1].type) 
-                              && [EquationComponentType.Number, EquationComponentType.Parentheses, EquationComponentType.Unknown].includes(components[i+1].type))
-                    break;
-                case EquationComponentType.Unknown:
-                    error = ( [EquationComponentType.Unknown, EquationComponentType.Number].includes(components[i+1].type))
-                    break;
-                case EquationComponentType.Parentheses:
-                    error = ( [...(value==')' ? [EquationComponentType.Number, EquationComponentType.Unknown] : []), EquationComponentType.Parentheses].includes(components[i+1].type))
-                    break;
-            }
-                        
-            if (type == EquationComponentType.Equal || (i != 1 && components[i-1].type != EquationComponentType.Equal && type == EquationComponentType.Operation)) {
-                components[i].element.text(' ' + components[i].element.text() + ' ')
-            }
+            this.components = components.slice(0);
+            
+            components.unshift(new EquationComponent(''));        
+            components.push(new EquationComponent(''));  
+            for (let i = 1; i < components.length-1 && !error; i++) {
+                let value = components[i].value;
+                let type = components[i].type;
+                
+                switch (type) {
+                    case EquationComponentType.Operation:
+                        error = !(   [...(value=='-' ? [EquationComponentType.Empty, EquationComponentType.Equal] : []), EquationComponentType.Number, EquationComponentType.Parentheses, EquationComponentType.Unknown].includes(components[i-1].type) 
+                                  && [EquationComponentType.Number, EquationComponentType.Parentheses, EquationComponentType.Unknown].includes(components[i+1].type))
+                        break;
+                    case EquationComponentType.Unknown:
+                        error = ( [EquationComponentType.Unknown, EquationComponentType.Number].includes(components[i+1].type))
+                        break;
+                    case EquationComponentType.Parentheses:
+                        error = ( [...(value==')' ? [EquationComponentType.Number, EquationComponentType.Unknown] : []), EquationComponentType.Parentheses].includes(components[i+1].type))
+                        break;
+                }
+                            
+                if (type == EquationComponentType.Equal || (i != 1 && components[i-1].type != EquationComponentType.Equal && type == EquationComponentType.Operation)) {
+                    components[i].element.text(' ' + components[i].element.text() + ' ')
+                }
 
+            }
         }
-        
    
         if ( error ) {
             this.components = [];

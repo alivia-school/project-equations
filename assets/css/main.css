@@ -25,6 +25,10 @@ body {
     margin-right: auto; 
 }
 
+.bry__control_label {
+    margin: 0 30px;  
+}
+
 @media only screen and (max-width: 1000px) {   
     body {
         --scale: 0.7;

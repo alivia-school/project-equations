@@ -1,5 +1,5 @@
 __BRYTHON__.use_VFS = true;
-var scripts = {"$timestamp": 1731012885523, "Controls.Button": [".py", "from Controls import Control\n\nclass Button(Control):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["Controls"]], "Controls": [".py", "from core import Component\n\nclass Control(Component):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["core"], 1]}
+var scripts = {"$timestamp": 1731862495315, "Controls.Button": [".py", "from Controls import Control\n\nclass Button(Control):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["Controls"]], "Controls.Label": [".py", "from Controls import Control\n\nclass Label(Control):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["Controls"]], "Controls": [".py", "from core import Component\n\nclass Control(Component):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["core"], 1]}
 __BRYTHON__.update_VFS(scripts)
 ;
 (function(){const __$tmp = document.createElement("style");__$tmp.textContent = `.bry__control {
@@ -12,6 +12,11 @@ __BRYTHON__.update_VFS(scripts)
 .bry__control_button {
     min-width: 200px;
     cursor: pointer;
+}
+
+.bry__control_label {
+    border: none;
+    text-align: left;    
 }`;document.head.appendChild(__$tmp);})();
 class Control extends Component {
     
@@ -23,7 +28,7 @@ class Control extends Component {
     set text(val) {
         this.e.text(val);
     }
-    get speed() {
+    get text() {
         this.e.text();
     }
         
@@ -40,4 +45,16 @@ class Button extends Control {
 
 }
 
-window.Button = Button
+window.Button = Button;
+
+class Label extends Control {
+    
+    constructor(container) {   
+        var e = $('<p></p>');
+        
+        super(container, e);
+    }
+
+}
+
+window.Label = Label
