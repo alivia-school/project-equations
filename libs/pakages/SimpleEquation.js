@@ -1,5 +1,5 @@
 __BRYTHON__.use_VFS = true;
-var scripts = {"$timestamp": 1731862495168, "Equation": [".py", "from browser import window\nfrom core import Object\n\nclass Equation(Object):\n def __init__(self,value):\n  super().__init__(value)\n  \n  \nEquationComponentType=window.EquationComponentType\n\n\n\n", ["browser", "core"]], "SimpleEquationComponent": [".py", "from browser import window\nfrom core import Component\n\nclass SimpleEquation(Component):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["browser", "core"]]}
+var scripts = {"$timestamp": 1731897429886, "Equation": [".py", "from browser import window\nfrom core import Object\n\nclass Equation(Object):\n def __init__(self,value):\n  super().__init__(value)\n  \n  \nEquationComponentType=window.EquationComponentType\n\n\n\n", ["browser", "core"]], "SimpleEquationComponent": [".py", "from browser import window\nfrom core import Component\n\nclass SimpleEquation(Component):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["browser", "core"]]}
 __BRYTHON__.update_VFS(scripts)
 ;
 (function(){const __$tmp = document.createElement("style");__$tmp.textContent = `
@@ -151,6 +151,8 @@ class Equation  {
         var val = this.value.replace(/ /g,'');
         var components = []
         
+        this.components = [];
+        
         if (val != "") {
         
             let collected = {
@@ -242,6 +244,9 @@ class Equation  {
                     case EquationComponentType.Parentheses:
                         error = ( [...(value==')' ? [EquationComponentType.Number, EquationComponentType.Unknown] : []), EquationComponentType.Parentheses].includes(components[i+1].type))
                         break;
+                    case EquationComponentType.Equal:
+                        error = ( [EquationComponentType.Empty].includes(components[i+1].type) )
+                        break;
                 }
                             
                 if (type == EquationComponentType.Equal || (i != 1 && components[i-1].type != EquationComponentType.Equal && type == EquationComponentType.Operation)) {
@@ -251,9 +256,6 @@ class Equation  {
             }
         }
    
-        if ( error ) {
-            this.components = [];
-        }       
         this.error = error
         
     }
