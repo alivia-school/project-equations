@@ -20,7 +20,7 @@ result = True
 
 # Компонент уравнения
 ce = SimpleEquation()
-ce.equation.value = "2x-1=x" #  пока для теста
+ce.equation.value = "2x + 5 = 3x - 2(x - 3)" #  пока для теста
 
 
 # Кнопка выполнить
@@ -123,6 +123,13 @@ def do(e):
             note.text += "В данном случае перенос не требуется. Нажмите далее для перехода к следующему этапу"
             result = True
             
+    # Третья стадия    
+    elif stage == 3:
+        
+        # Пояснение
+        note.text = "Третий этап. На этом этапе уростите уравнение."
+        note.text += "Пока не сделано("
+       
             
             
 @bind(button_reset.element, "click")

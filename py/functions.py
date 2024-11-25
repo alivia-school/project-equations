@@ -1,4 +1,3 @@
-from browser import console
 from Equation import EquationComponentType, EquationComponent
 
 # Перевести число в строку со знаком "+" если число >= 0 и плюс нужен
@@ -156,20 +155,104 @@ def expandParentheses(equation):
 
 # Проверка нужен ли перенос элементов в уравнении
 def needMove(equation):
-    for c in equation.left():
-        console.log(c);
+    # Проверим левую чась
+    for c in equation.left():        
+        if c.type == EquationComponentType.Number:
+            # Если есть числа слева, то перенос нужен
+            return True   
+            
+    # Проверим правую чась
     for c in equation.rigth():
-        console.log(c);
+        if c.type == EquationComponentType.Unknown:
+            # Если есть неизвестное справа, то перенос нужен
+            return True    
     
     return False
     
     
 # Пометить элементы для переноса
 def markMoveElements(equation):
-    return False   
-
+    a = EquationComponent(0)
+    # Для левой части
+    for c in equation.left():
+        if c.type == EquationComponentType.Number:
+            a.color = "red"
+            c.color = "red"
+            a = EquationComponent(0)
+        elif c.type == EquationComponentType.Operation:        
+            a = c
+            
+    # Для правой части
+    for c in equation.rigth():
+        if c.type == EquationComponentType.Unknown:
+            a.color = "blue"
+            c.color = "blue"
+            a = EquationComponent(0)
+        elif c.type == EquationComponentType.Operation:        
+            a = c
+        
 
 # Выполнить перенос
 def moveElements(equation):
-    return ''     
+    ## Переменные: ##
+    # Результат левой части
+    rl = ""
+    # Результат правой части
+    rr = ""
+    
+    # Знак
+    s = 1
+        
+    # Оставим неизвесные слева
+    for c in equation.left():        
+            
+        # Оставим неизвестное слева    
+        if c.type == EquationComponentType.Unknown:
+            # Текущая компонента - неизвестное                
+            rl += str_plus(c.factor_value * s, rl=="", True) + c.value
+          
+                
+        # Сохраняем знак
+        if c.type == EquationComponentType.Operation:                
+            if c.value == '-': 
+                s = -1
+            else:
+                s = 1 
+                
+            
+    # Сбросим знак
+    s = 1             
+    
+    # Оставим числа справа и перенесем неизвестное влево
+    for c in equation.rigth():
+
+        # Перенесем неизвестное влево с противоположным знаком
+        if c.type == EquationComponentType.Unknown:
+            # Текущая компонента - неизвестное                
+            rl += str_plus(c.factor_value * -s, rl=="", True) + c.value
+          
+        # Оставим числа справа
+        if c.type == EquationComponentType.Number:
+            # Текущая компонента - число                
+            rr += str_plus(c.value * s, rr=="")            
+            
+        # Сохраняем знак
+        if c.type == EquationComponentType.Operation:                
+            if c.value == '-': 
+                s = -1
+            else:
+                s = 1             
+
+    # Сбросим знак
+    s = 1             
+    
+    # Перенесем числа вправо
+    for c in equation.left():        
+        # Перенесем числа вправо с противоположным знаком
+        if c.type == EquationComponentType.Number:
+            # Текущая компонента - число                
+            rr += str_plus(c.value * -s, rr=="")            
+
+
+    return rl + "=" + rr
     
