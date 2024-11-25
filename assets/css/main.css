@@ -26,8 +26,15 @@ body {
 }
 
 .bry__control_label {
-    margin: 0 30px;  
+    white-space: pre-wrap;
+    margin: 0 10px;  
 }
+
+.bry__control_button {
+    min-width: calc(220px * var(--scale, 1));
+    margin: 0 10px;
+}
+
 
 @media only screen and (max-width: 1000px) {   
     body {

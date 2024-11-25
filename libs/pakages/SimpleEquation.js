@@ -1,5 +1,5 @@
 __BRYTHON__.use_VFS = true;
-var scripts = {"$timestamp": 1731897429886, "Equation": [".py", "from browser import window\nfrom core import Object\n\nclass Equation(Object):\n def __init__(self,value):\n  super().__init__(value)\n  \n  \nEquationComponentType=window.EquationComponentType\n\n\n\n", ["browser", "core"]], "SimpleEquationComponent": [".py", "from browser import window\nfrom core import Component\n\nclass SimpleEquation(Component):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["browser", "core"]]}
+var scripts = {"$timestamp": 1732469726143, "Equation": [".py", "from browser import window\nfrom core import Object\n\nclass Equation(Object):\n def __init__(self,value=\"\"):\n  super().__init__(value)\n  \nclass EquationComponent(Object):\n def __init__(self,value,factor_value=\"\"):\n  super().__init__(value,factor_value)\n  \nEquationComponentType=window.EquationComponentType\n\n\n\n", ["browser", "core"]], "SimpleEquationComponent": [".py", "from browser import window\nfrom core import Component\n\nclass SimpleEquation(Component):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["browser", "core"]]}
 __BRYTHON__.update_VFS(scripts)
 ;
 (function(){const __$tmp = document.createElement("style");__$tmp.textContent = `
@@ -82,16 +82,20 @@ EquationComponentType = {
 
 class EquationComponent  {
     
-    constructor(value) {
+    constructor(value, factor_value='') {
         
         if (value instanceof EquationComponent) {
             // Clone from value
             this.value = value.value;
+            this.factor_value = value.factor_value;
             this.type = value.type;
+            this.as_factor = value.as_factor;
             this.element = value.element.clone();
         } else {
             this.value = value
-           
+            this.factor_value = factor_value;
+            this.as_factor = false;
+            
             if ( value === '' )
                 this.type = EquationComponentType.Empty;            
             else if ( value === '=' )
@@ -105,7 +109,10 @@ class EquationComponent  {
             else
                 this.type = EquationComponentType.Unknown;
                                 
-            this.element =  $('<span>' + value + '</span>');
+            this.element =  $('<span>' + (factor_value==1?'':factor_value) + value + '</span>');
+            
+            if (this.type == EquationComponentType.Unknown && !factor_value)
+                this.factor_value = 1
         }
         
     } 
@@ -126,6 +133,7 @@ class Equation  {
     
     error = false
     components = [];
+    unknown = '';
     
     constructor(value="") {
         if (value) {
@@ -136,6 +144,7 @@ class Equation  {
     copy(from) {
         this.#value = from.value;
         this.error = from.error;
+        this.unknown = from.unknown;
         // copy components
         this.components = [];
         for (const component of from.components) {
@@ -144,14 +153,47 @@ class Equation  {
         this.update();        
     }
     
+    equal(equation) {
+        return (this.value.replace(/ /g,'') === equation.value.replace(/ /g,''));  
+    }
+    isSame(equation) {
+        return (this.value.replace(/ /g,'') === equation.replace(/ /g,''))
+    }
+    
+    left() {
+        var r = [];
+        
+        for (const component of this.components) {
+            if (component.type == EquationComponentType.Equal) {
+                break;
+            }
+            r.push(component);
+        }     
+        return r;
+    }
+ 
+    rigth() {
+        var r = [];
+        var b = false;
+        
+        for (const component of this.components) {
+            if (component.type == EquationComponentType.Equal) {
+                b = true;
+                continue;
+            }
+            if (b) {
+                r.push(component);
+            }
+        }     
+        return r;
+    }
+    
     update() {}
     
     #parse() {
         var error = false;
         var val = this.value.replace(/ /g,'');
         var components = []
-        
-        this.components = [];
         
         if (val != "") {
         
@@ -178,11 +220,25 @@ class Equation  {
                 }
                 checkNumber()
 
-                if ((c > 'a' && c < 'z') || (c > 'A' && c < 'Z')) {
-                    if ( !collected.cur_x ) 
+                if ((c > 'a' && c < 'z')) {
+                    if ( !collected.cur_x ) {
                         collected.cur_x = c; 
-                    else if ( collected.cur_x != c)
-                        error = true                
+                    } else if ( collected.cur_x != c) {
+                        error = true 
+                        continue
+                    }
+                    if (components.length > 0) {
+                        let lastComponent = components.slice(-1)[0];
+                        if (lastComponent.type == EquationComponentType.Number) {
+                            if (lastComponent.value == 0) {
+                                error = true 
+                                continue
+                            }
+                            components.pop();
+                            components.push(new EquationComponent(c, lastComponent.value));
+                            continue;
+                        } 
+                    }
                     components.push(new EquationComponent(c));
                     continue;
                 }
@@ -226,6 +282,7 @@ class Equation  {
                 error = true 
             
             this.components = components.slice(0);
+            this.unknown = collected.cur_x
             
             components.unshift(new EquationComponent(''));        
             components.push(new EquationComponent(''));  
@@ -255,9 +312,39 @@ class Equation  {
 
             }
         }
-   
-        this.error = error
         
+        if (!error) {
+            //Check parentheses factor
+            let inBlock = false;
+            let curFactor = new EquationComponent('');
+            for (const component of this.components) {
+                if (component.value == '(') {
+                    inBlock = true;
+                    if (curFactor.type != EquationComponentType.Operation)
+                        curFactor.as_factor = true;
+                } else if (component.value == ')') {
+                    inBlock = false;            
+                    curFactor = new EquationComponent('');
+                } else if (inBlock) {
+                    if (    curFactor.value == 0
+                        || (curFactor.type == EquationComponentType.Unknown && component.value == curFactor.value)) {
+                        error = true;
+                        break
+                    }
+                } else {
+                    curFactor = component
+                }
+            }
+        }
+        
+           
+        this.error = error;
+        
+        if (error || val === "") {
+            this.components = [];
+            this.unknown = '';
+        }
+                
     }
     
     fillTo(container) {
@@ -266,13 +353,10 @@ class Equation  {
             component.element.appendTo(container);
     }
     
-    isSame(equation) {
-        return ( this.value.replace(/ /g,'') === equation.replace(/ /g,'') )
-    }
 
     /* value property */
     set value(val) {
-        this.#value = val;
+        this.#value = val.toLowerCase();
         this.#parse();
         this.update();
     }
@@ -338,7 +422,13 @@ class SimpleEquation extends Component {
             this.input.blur();
         }
     }
-       
+    
+    before(e) {
+        $(e).before(this.e);
+    }
+    after(e) {
+        $(e).after(this.e);
+    }       
        
     /* readOnly property */
     set readOnly(val) {
@@ -356,6 +446,15 @@ class SimpleEquation extends Component {
     get equation() {
         return this.#equation;
     } 
+    
+    /* placeholder property */
+    set placeholder(val) {
+        this.e.css("--placeholder", val ? '"'+val+'"' : '')
+    }
+    get placeholder() {
+        return this.e.css("--placeholder");
+    } 
+    
 }
 
 window.SimpleEquation = SimpleEquation
