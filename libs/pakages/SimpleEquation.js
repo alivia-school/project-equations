@@ -1,5 +1,5 @@
 __BRYTHON__.use_VFS = true;
-var scripts = {"$timestamp": 1732469726143, "Equation": [".py", "from browser import window\nfrom core import Object\n\nclass Equation(Object):\n def __init__(self,value=\"\"):\n  super().__init__(value)\n  \nclass EquationComponent(Object):\n def __init__(self,value,factor_value=\"\"):\n  super().__init__(value,factor_value)\n  \nEquationComponentType=window.EquationComponentType\n\n\n\n", ["browser", "core"]], "SimpleEquationComponent": [".py", "from browser import window\nfrom core import Component\n\nclass SimpleEquation(Component):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["browser", "core"]]}
+var scripts = {"$timestamp": 1733239597918, "Equation": [".py", "from browser import window\nfrom core import Object\n\nclass Equation(Object):\n def __init__(self,value=\"\"):\n  super().__init__(value)\n  \nclass EquationComponent(Object):\n def __init__(self,value,factor_value=\"\"):\n  super().__init__(value,factor_value)\n  \nEquationComponentType=window.EquationComponentType\n\n\n\n", ["browser", "core"]], "SimpleEquationComponent": [".py", "from browser import window\nfrom core import Component\n\nclass SimpleEquation(Component):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["browser", "core"]]}
 __BRYTHON__.update_VFS(scripts)
 ;
 (function(){const __$tmp = document.createElement("style");__$tmp.textContent = `
@@ -299,13 +299,15 @@ class Equation  {
                         error = ( [EquationComponentType.Unknown, EquationComponentType.Number].includes(components[i+1].type))
                         break;
                     case EquationComponentType.Parentheses:
-                        error = ( [...(value==')' ? [EquationComponentType.Number, EquationComponentType.Unknown] : []), EquationComponentType.Parentheses].includes(components[i+1].type))
+                        error = ( [EquationComponentType.Parentheses].includes(components[i+1].type))
                         break;
                     case EquationComponentType.Equal:
                         error = ( [EquationComponentType.Empty].includes(components[i+1].type) )
                         break;
                 }
-                            
+                
+				
+				
                 if (type == EquationComponentType.Equal || (i != 1 && components[i-1].type != EquationComponentType.Equal && type == EquationComponentType.Operation)) {
                     components[i].element.text(' ' + components[i].element.text() + ' ')
                 }
@@ -313,6 +315,36 @@ class Equation  {
             }
         }
         
+        if (!error) {
+			
+			//Move rigth factor to left
+			let pp = -1;
+            let curFactor = new EquationComponent('');
+            for (let i = 0; i < this.components.length; i++) {
+				let c = this.components[i]
+                if (c.value == '(' && !([EquationComponentType.Number, EquationComponentType.Unknown].includes(curFactor.type))) {
+					pp = i;
+				} else if (c.value == ')') {
+                    if (i < this.components.length-1) {
+						let nc = this.components[i+1];
+						if ([EquationComponentType.Number, EquationComponentType.Unknown].includes(nc.type)) {
+							if (pp == -1) {
+								error = true;
+								break;
+							}
+							//Move
+							this.components.splice(pp, 0, nc);
+							this.components.splice(i+2, 1);
+						}
+					}
+					pp = -1;
+                } 
+				
+                curFactor = c;
+				
+			}
+		}
+		
         if (!error) {
             //Check parentheses factor
             let inBlock = false;
@@ -326,7 +358,7 @@ class Equation  {
                     inBlock = false;            
                     curFactor = new EquationComponent('');
                 } else if (inBlock) {
-                    if (    curFactor.value == 0
+                    if (    curFactor.value === 0
                         || (curFactor.type == EquationComponentType.Unknown && component.value == curFactor.value)) {
                         error = true;
                         break

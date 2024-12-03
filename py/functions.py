@@ -251,8 +251,80 @@ def moveElements(equation):
         # Перенесем числа вправо с противоположным знаком
         if c.type == EquationComponentType.Number:
             # Текущая компонента - число                
-            rr += str_plus(c.value * -s, rr=="")            
+            rr += str_plus(c.value * -s, rr=="") 
+            
+        # Сохраняем знак
+        if c.type == EquationComponentType.Operation:                
+            if c.value == '-': 
+                s = -1
+            else:
+                s = 1             
 
 
     return rl + "=" + rr
+    
+    
+    
+
+# Проверка нужен ли упрощение 
+def needSimplification(equation):
+    # Проверим левую чась
+    if len(equation.left()) >= 3:        
+        return True   
+            
+    # Проверим правую часть
+    if len(equation.rigth()) >= 3:
+        return True    
+    
+    return False
+    
+    
+# Пометить элементы для упрощения
+def markSimplificationElements(equation):
+    # Обходим все компоненты уравнения
+    for c in equation.components:
+        if c.type == EquationComponentType.Operation: 
+            c.color = "red"
+            
+        
+
+# Выполнить упрощения
+def simplificationElements(equation):
+    ## Переменные: ##
+    # Результат левой части
+    rl = 0
+    # Результат правой части
+    rr = 0
+    
+    # Знак
+    s = 1
+        
+    # Упрощаем левую часть
+    for c in equation.left():        
+                     
+        if c.type == EquationComponentType.Operation:
+            # Сохраняем знак
+            if c.value == '-': 
+                s = -1
+            else:
+                s = 1 
+        else:
+            rl += c.factor_value * s
+
+         
+    # Упрощаем правую часть
+    for c in equation.rigth():        
+            
+        if c.type == EquationComponentType.Operation:
+            # Сохраняем знак
+            if c.value == '-': 
+                s = -1
+            else:
+                s = 1 
+        else:
+            rr += c.value * s            
+   
+
+    return str_plus(rl, True, True) + equation.unknown + "=" + str_plus(rr, True, False)
+        
     

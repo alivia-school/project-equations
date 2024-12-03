@@ -128,9 +128,38 @@ def do(e):
         
         # Пояснение
         note.text = "Третий этап. На этом этапе уростите уравнение."
-        note.text += "Пока не сделано("
-       
+        
+        #Проверка нужно ли упрощать
+        if needSimplification(eq):
+            # Да нужно
             
+            # Создадим еще одно поле для уравнения - ответа
+            ce = SimpleEquation()
+            ce.before(button_do.element)
+            ce.placeholder = "Введите ответ"   
+        
+            # Дополним пояснение
+            note.text += tip_stage_three
+            
+            # Пометим что упрощать
+            markSimplificationElements(eq)
+            
+            # Выполним упрощение, чтобы проверить ответ введенный пользователем и сохраним результат
+            result = simplificationElements(eq)
+            console.log(result) # !!!ОТЛАДКА
+            
+        else:
+            # Не нужно упрощать
+            note.text += "В данном случае упрощение не требуется. Нажмите далее для перехода к следующему этапу"
+            result = True
+       
+    # Четвертая стадия    
+    elif stage == 4:
+        
+        # Пояснение
+        note.text = "Четвертый этап. На этом этапе вычислите неизвестное."
+    
+    
             
 @bind(button_reset.element, "click")
 def reset(e):  
