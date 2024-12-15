@@ -20,8 +20,6 @@ result = True
 
 # Компонент уравнения
 ce = SimpleEquation()
-ce.equation.value = "2x = 3" #  пока для теста
-
 
 # Кнопка выполнить
 button_do = Button(text="Начать")
