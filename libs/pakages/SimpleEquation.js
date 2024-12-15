@@ -1,5 +1,5 @@
 __BRYTHON__.use_VFS = true;
-var scripts = {"$timestamp": 1733239597918, "Equation": [".py", "from browser import window\nfrom core import Object\n\nclass Equation(Object):\n def __init__(self,value=\"\"):\n  super().__init__(value)\n  \nclass EquationComponent(Object):\n def __init__(self,value,factor_value=\"\"):\n  super().__init__(value,factor_value)\n  \nEquationComponentType=window.EquationComponentType\n\n\n\n", ["browser", "core"]], "SimpleEquationComponent": [".py", "from browser import window\nfrom core import Component\n\nclass SimpleEquation(Component):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["browser", "core"]]}
+var scripts = {"$timestamp": 1734100167111, "Equation": [".py", "from browser import window\nfrom core import Object\n\nclass Equation(Object):\n def __init__(self,value=\"\"):\n  super().__init__(value)\n  \nclass EquationComponent(Object):\n def __init__(self,value,factor_value=\"\"):\n  super().__init__(value,factor_value)\n  \nEquationComponentType=window.EquationComponentType\n\n\n\n", ["browser", "core"]], "SimpleEquationComponent": [".py", "from browser import window\nfrom core import Component\n\nclass SimpleEquation(Component):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["browser", "core"]]}
 __BRYTHON__.update_VFS(scripts)
 ;
 (function(){const __$tmp = document.createElement("style");__$tmp.textContent = `
@@ -100,6 +100,8 @@ class EquationComponent  {
                 this.type = EquationComponentType.Empty;            
             else if ( value === '=' )
                 this.type = EquationComponentType.Equal;
+            else if ( value === '/' )
+                this.type = EquationComponentType.Fraction;
             else if ( ['(', ')'].includes(value) )
                 this.type = EquationComponentType.Parentheses;
             else if ( ['+', '-'].includes(value) )
@@ -134,6 +136,7 @@ class Equation  {
     error = false
     components = [];
     unknown = '';
+    isResult = false;
     
     constructor(value="") {
         if (value) {
@@ -261,6 +264,7 @@ class Equation  {
                         
                     case '+':
                     case '-':
+                    case '/':
                         break;                    
                         
                     default:
@@ -306,45 +310,56 @@ class Equation  {
                         break;
                 }
                 
-				
-				
+                
+                
                 if (type == EquationComponentType.Equal || (i != 1 && components[i-1].type != EquationComponentType.Equal && type == EquationComponentType.Operation)) {
                     components[i].element.text(' ' + components[i].element.text() + ' ')
                 }
 
             }
         }
-        
+
+        if (!error ) {
+            // Allow fraction in result
+            for (const c of this.components) {
+                if (c.value == '/') {
+                    error = !(   this.isResult && this.components.length==5 && this.components[0].factor_value==1 && this.components[3].value == '/'
+                              && this.components[2].type == EquationComponentType.Number && this.components[4].type == EquationComponentType.Number)
+                    break;
+                }
+            }
+        }
+                    
         if (!error) {
-			
-			//Move rigth factor to left
-			let pp = -1;
+            
+            //Move rigth factor to left
+            let pp = -1;
             let curFactor = new EquationComponent('');
             for (let i = 0; i < this.components.length; i++) {
-				let c = this.components[i]
+                let c = this.components[i]
                 if (c.value == '(' && !([EquationComponentType.Number, EquationComponentType.Unknown].includes(curFactor.type))) {
-					pp = i;
-				} else if (c.value == ')') {
+                    pp = i;
+                } else if (c.value == ')') {
                     if (i < this.components.length-1) {
-						let nc = this.components[i+1];
-						if ([EquationComponentType.Number, EquationComponentType.Unknown].includes(nc.type)) {
-							if (pp == -1) {
-								error = true;
-								break;
-							}
-							//Move
-							this.components.splice(pp, 0, nc);
-							this.components.splice(i+2, 1);
-						}
-					}
-					pp = -1;
+                        let nc = this.components[i+1];
+                        if ([EquationComponentType.Number, EquationComponentType.Unknown].includes(nc.type)) {
+                            if (pp == -1) {
+                                error = true;
+                                break;
+                            }
+                            //Move
+                            this.components.splice(pp, 0, nc);
+                            this.components.splice(i+2, 1);
+                        }
+                    }
+                    pp = -1;
                 } 
-				
+                
                 curFactor = c;
-				
-			}
-		}
-		
+                
+            }
+        }
+        
         if (!error) {
             //Check parentheses factor
             let inBlock = false;
@@ -477,6 +492,14 @@ class SimpleEquation extends Component {
     }
     get equation() {
         return this.#equation;
+    } 
+    
+    /* isResult property */
+    set isResult(val) {
+        this.#equation.isResult = val;
+    }
+    get isResult() {
+        return this.#equation.isResult;
     } 
     
     /* placeholder property */

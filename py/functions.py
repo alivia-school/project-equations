@@ -192,6 +192,7 @@ def markMoveElements(equation):
             a = c
         
 
+
 # Выполнить перенос
 def moveElements(equation):
     ## Переменные: ##
@@ -203,7 +204,7 @@ def moveElements(equation):
     # Знак
     s = 1
         
-    # Оставим неизвесные слева
+    # Оставим неизвестные слева
     for c in equation.left():        
             
         # Оставим неизвестное слева    
@@ -266,9 +267,9 @@ def moveElements(equation):
     
     
 
-# Проверка нужен ли упрощение 
+# Проверка нужно ли упрощение 
 def needSimplification(equation):
-    # Проверим левую чась
+    # Проверим левую часть
     if len(equation.left()) >= 3:        
         return True   
             
@@ -328,3 +329,44 @@ def simplificationElements(equation):
     return str_plus(rl, True, True) + equation.unknown + "=" + str_plus(rr, True, False)
         
     
+
+# Проверка нужно ли вычислять неизвестное
+def needCalcUnknown(equation):
+    
+    # Возьмем левую часть
+    l = equation.left()
+    
+    if l[0].value == '-':
+        # Если есть минус, то нужно вычислять, так как -x это -1 * x
+        return True  
+        
+    if l[0].factor_value > 1:
+        # Если фактор (то что мы умножаем на неизвестное) больше 1, то вычисление тоже нужно            
+        return True
+        
+    # В других случаях вычисление не нужно
+    return False        
+    
+    
+def calcUnknown(equation):
+    
+    # Определим левую часть
+    a = equation.left()       
+    if a[0].value == '-':
+        l = -a[1].factor_value
+    else:
+        l = a[0].factor_value   
+
+    # Определим правую часть
+    a = equation.rigth()       
+    if a[0].value == '-':
+        r = -int(a[1].value)
+    else:
+        r = int(a[0].value)  
+        
+    # Проверим делится ли нацело (нет остатка)
+    if r % l == 0:
+        return equation.unknown + "=" + str(int(r/l))
+    else:
+        return equation.unknown + "=" + str(r) + "/" + str(l)
+        

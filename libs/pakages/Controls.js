@@ -1,5 +1,5 @@
 __BRYTHON__.use_VFS = true;
-var scripts = {"$timestamp": 1733239598127, "Controls.Button": [".py", "from Controls import Control\n\nclass Button(Control):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["Controls"]], "Controls.Label": [".py", "from Controls import Control\n\nclass Label(Control):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["Controls"]], "Controls": [".py", "from core import Component\n\nclass Control(Component):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["core"], 1]}
+var scripts = {"$timestamp": 1734100167309, "Controls.Button": [".py", "from Controls import Control\n\nclass Button(Control):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["Controls"]], "Controls.Label": [".py", "from Controls import Control\n\nclass Label(Control):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["Controls"]], "Controls": [".py", "from core import Component\n\nclass Control(Component):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["core"], 1]}
 __BRYTHON__.update_VFS(scripts)
 ;
 (function(){const __$tmp = document.createElement("style");__$tmp.textContent = `.bry__control {
@@ -21,6 +21,13 @@ class Control extends Component {
     
     constructor(container, e) {                      
         super(container, e);             
+    }
+    
+    hide() {
+        this.e.hide();
+    }
+    show() {
+        this.e.show();
     }
     
     /* text  property */
