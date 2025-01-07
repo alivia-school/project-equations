@@ -30,6 +30,8 @@ button_reset = Button(text="Заново")
 # Метка с пояснением
 note = Label()
 
+
+#Событие нажатие на кнопку "Начать"/"Далее"
 @bind(button_do.element, "click")
 def do(e):
     # Используем эти глобальные переменные
@@ -186,6 +188,7 @@ def do(e):
             
             
             
+#Событие нажатие на кнопку "Заново"            
 @bind(button_reset.element, "click")
 def reset(e):  
     if confirm("Вы хотите завершить работу с текущим уравнением?") == True:
@@ -193,4 +196,6 @@ def reset(e):
 
 
 
+ 
+ 
  

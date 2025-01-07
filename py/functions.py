@@ -1,4 +1,6 @@
+# Используем компоненты для работы с уравнением
 from Equation import EquationComponentType, EquationComponent
+
 
 # Перевести число в строку со знаком "+" если число >= 0 и плюс нужен
 # Также не печатаем "1" перед неизвестным (1x = x)
@@ -152,7 +154,6 @@ def expandParentheses(equation):
     return r
 
 
-
 # Проверка нужен ли перенос элементов в уравнении
 def needMove(equation):
     # Проверим левую чась
@@ -191,7 +192,6 @@ def markMoveElements(equation):
         elif c.type == EquationComponentType.Operation:        
             a = c
         
-
 
 # Выполнить перенос
 def moveElements(equation):
@@ -261,12 +261,10 @@ def moveElements(equation):
             else:
                 s = 1             
 
-
+    # Вернем полученное уравнение, соединив левую и правую часть
     return rl + "=" + rr
     
     
-    
-
 # Проверка нужно ли упрощение 
 def needSimplification(equation):
     # Проверим левую часть
@@ -325,7 +323,7 @@ def simplificationElements(equation):
         else:
             rr += c.value * s            
    
-
+    # Вернем полученное уравнение, соединив левую и правую часть
     return str_plus(rl, True, True) + equation.unknown + "=" + str_plus(rr, True, False)
         
     
@@ -348,6 +346,7 @@ def needCalcUnknown(equation):
     return False        
     
     
+# Вычисление неизвестного
 def calcUnknown(equation):
     
     # Определим левую часть
@@ -369,4 +368,6 @@ def calcUnknown(equation):
         return equation.unknown + "=" + str(int(r/l))
     else:
         return equation.unknown + "=" + str(r) + "/" + str(l)
+        
+        
         
