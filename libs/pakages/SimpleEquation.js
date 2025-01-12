@@ -1,5 +1,5 @@
 __BRYTHON__.use_VFS = true;
-var scripts = {"$timestamp": 1734100167111, "Equation": [".py", "from browser import window\nfrom core import Object\n\nclass Equation(Object):\n def __init__(self,value=\"\"):\n  super().__init__(value)\n  \nclass EquationComponent(Object):\n def __init__(self,value,factor_value=\"\"):\n  super().__init__(value,factor_value)\n  \nEquationComponentType=window.EquationComponentType\n\n\n\n", ["browser", "core"]], "SimpleEquationComponent": [".py", "from browser import window\nfrom core import Component\n\nclass SimpleEquation(Component):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["browser", "core"]]}
+var scripts = {"$timestamp": 1736692451919, "Equation": [".py", "from browser import window\nfrom core import Object\n\nclass Equation(Object):\n def __init__(self,value=\"\"):\n  super().__init__(value)\n  \nclass EquationComponent(Object):\n def __init__(self,value,factor_value=\"\"):\n  super().__init__(value,factor_value)\n  \nEquationComponentType=window.EquationComponentType\n\n\n\n", ["browser", "core"]], "SimpleEquationComponent": [".py", "from browser import window\nfrom core import Component\n\nclass SimpleEquation(Component):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["browser", "core"]]}
 __BRYTHON__.update_VFS(scripts)
 ;
 (function(){const __$tmp = document.createElement("style");__$tmp.textContent = `
@@ -332,7 +332,7 @@ class Equation  {
                     
         if (!error) {
             
-            //Move rigth factor to left
+            //Move right factor to left
             let pp = -1;
             let curFactor = new EquationComponent('');
             for (let i = 0; i < this.components.length; i++) {
@@ -383,6 +383,17 @@ class Equation  {
                 }
             }
         }
+        
+        if (!error) {
+            //Check have any number
+            error = true;
+            for (const component of this.components) {
+                if (component.type == EquationComponentType.Number) {
+                    error = false;
+                    break
+                }
+            }
+        }        
         
            
         this.error = error;

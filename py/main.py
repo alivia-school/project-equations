@@ -26,7 +26,6 @@ button_do = Button(text="Начать")
 # Кнопка заново
 button_reset = Button(text="Заново")
 
-
 # Метка с пояснением
 note = Label()
 
@@ -44,7 +43,8 @@ def do(e):
     if eq.value == "" or eq.error == True:
         alert("Ошибка в уравнении")
         return
-            
+    
+    console.log(result)
     if result != True:
         # Нужно проверить результат
         if not eq.isSame(result):
