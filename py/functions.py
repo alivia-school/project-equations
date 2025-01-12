@@ -310,6 +310,8 @@ def simplificationElements(equation):
         else:
             rl += c.factor_value * s
 
+    # Сбросим знак
+    s = 1
          
     # Упрощаем правую часть
     for c in equation.rigth():        
