@@ -1,5 +1,5 @@
 __BRYTHON__.use_VFS = true;
-var scripts = {"$timestamp": 1736771395050, "Equation": [".py", "from browser import window\nfrom core import Object\n\nclass Equation(Object):\n def __init__(self,value=\"\"):\n  super().__init__(value)\n  \nclass EquationComponent(Object):\n def __init__(self,value,factor_value=\"\"):\n  super().__init__(value,factor_value)\n  \nEquationComponentType=window.EquationComponentType\n\n\n\n", ["browser", "core"]], "SimpleEquationComponent": [".py", "from browser import window\nfrom core import Component\n\nclass SimpleEquation(Component):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["browser", "core"]]}
+var scripts = {"$timestamp": 1736777828218, "Equation": [".py", "from browser import window\nfrom core import Object\n\nclass Equation(Object):\n def __init__(self,value=\"\"):\n  super().__init__(value)\n  \nclass EquationComponent(Object):\n def __init__(self,value,factor_value=\"\"):\n  super().__init__(value,factor_value)\n  \nEquationComponentType=window.EquationComponentType\n\n\n\n", ["browser", "core"]], "SimpleEquationComponent": [".py", "from browser import window\nfrom core import Component\n\nclass SimpleEquation(Component):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["browser", "core"]]}
 __BRYTHON__.update_VFS(scripts)
 ;
 (function(){const __$tmp = document.createElement("style");__$tmp.textContent = `
@@ -324,8 +324,12 @@ class Equation  {
             // Allow fraction in result
             for (const c of this.components) {
                 if (c.value == '/') {
-                    error = !(   this.isResult && this.components.length==5 && this.components[0].factor_value==1 && this.components[3].value == '/'
-                              && this.components[2].type == EquationComponentType.Number && this.components[4].type == EquationComponentType.Number)
+                    if (this.components[2].value == '-') 
+                        error = !(   this.isResult && this.components.length==6 && this.components[0].factor_value==1 && this.components[4].value == '/'
+                                  && this.components[3].type == EquationComponentType.Number && this.components[5].type == EquationComponentType.Number)
+                    else
+                        error = !(   this.isResult && this.components.length==5 && this.components[0].factor_value==1 && this.components[3].value == '/'
+                                  && this.components[2].type == EquationComponentType.Number && this.components[4].type == EquationComponentType.Number)
                     break;
                 }
             }

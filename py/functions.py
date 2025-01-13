@@ -381,7 +381,9 @@ def calcUnknown(equation):
     if r % l == 0:
         return equation.unknown + "=" + str(int(r/l))
     else:
-        return equation.unknown + "=" + str(r) + "/" + str(l)
+        #Знак перед дробью
+        s = "-" if r/l<0 else ""
+        return equation.unknown + "=" + s + str(abs(r)) + "/" + str(abs(l))
         
         
         
