@@ -1,5 +1,5 @@
 __BRYTHON__.use_VFS = true;
-var scripts = {"$timestamp": 1736692451919, "Equation": [".py", "from browser import window\nfrom core import Object\n\nclass Equation(Object):\n def __init__(self,value=\"\"):\n  super().__init__(value)\n  \nclass EquationComponent(Object):\n def __init__(self,value,factor_value=\"\"):\n  super().__init__(value,factor_value)\n  \nEquationComponentType=window.EquationComponentType\n\n\n\n", ["browser", "core"]], "SimpleEquationComponent": [".py", "from browser import window\nfrom core import Component\n\nclass SimpleEquation(Component):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["browser", "core"]]}
+var scripts = {"$timestamp": 1736771395050, "Equation": [".py", "from browser import window\nfrom core import Object\n\nclass Equation(Object):\n def __init__(self,value=\"\"):\n  super().__init__(value)\n  \nclass EquationComponent(Object):\n def __init__(self,value,factor_value=\"\"):\n  super().__init__(value,factor_value)\n  \nEquationComponentType=window.EquationComponentType\n\n\n\n", ["browser", "core"]], "SimpleEquationComponent": [".py", "from browser import window\nfrom core import Component\n\nclass SimpleEquation(Component):\n\n def __init__(self,container=\"\",**props):\n  super().__init__(container,**props)\n", ["browser", "core"]]}
 __BRYTHON__.update_VFS(scripts)
 ;
 (function(){const __$tmp = document.createElement("style");__$tmp.textContent = `
@@ -195,7 +195,7 @@ class Equation  {
     
     #parse() {
         var error = false;
-        var val = this.value.replace(/ /g,'');
+        var val = this.value.replace(/ /g,'').replace(/–/g,'-');
         var components = []
         
         if (val != "") {
@@ -223,7 +223,7 @@ class Equation  {
                 }
                 checkNumber()
 
-                if ((c > 'a' && c < 'z')) {
+                if ((c >= 'a' && c <= 'z')) {
                     if ( !collected.cur_x ) {
                         collected.cur_x = c; 
                     } else if ( collected.cur_x != c) {
@@ -303,7 +303,8 @@ class Equation  {
                         error = ( [EquationComponentType.Unknown, EquationComponentType.Number].includes(components[i+1].type))
                         break;
                     case EquationComponentType.Parentheses:
-                        error = ( [EquationComponentType.Parentheses].includes(components[i+1].type))
+                        error = ( [EquationComponentType.Parentheses].includes(components[i+1].type)) ||
+                                 (value==')' && components[i-1].type==EquationComponentType.Operation)
                         break;
                     case EquationComponentType.Equal:
                         error = ( [EquationComponentType.Empty].includes(components[i+1].type) )
@@ -312,7 +313,7 @@ class Equation  {
                 
                 
                 
-                if (type == EquationComponentType.Equal || (i != 1 && components[i-1].type != EquationComponentType.Equal && type == EquationComponentType.Operation)) {
+                if (type == EquationComponentType.Equal || (i != 1 && components[i-1].type != EquationComponentType.Equal && components[i-1].value != '(' && type == EquationComponentType.Operation)) {
                     components[i].element.text(' ' + components[i].element.text() + ' ')
                 }
 

@@ -44,8 +44,10 @@ def expandParentheses(equation):
     ## Переменные: ##
     # Результат
     r = ""
-    # Знак
+    # Знак перед числом
     s = 1
+    # Знак перед скобками
+    sp = 1    
     # Компонент перед скобкой
     a = EquationComponent(1)
     # Флаг: Внутри скобок или нет
@@ -55,11 +57,14 @@ def expandParentheses(equation):
     
     # Обходим все компоненты уравнения
     for c in equation.components:       
-    
+        
         # Проверяем скобки    
         if c.value == '(':
             b = True
-            
+            # Сохраним знак перед скобками
+            sp = s
+            # Сбросим текущий знак на +
+            s = 1
             # К следующему компоненту уравнения
             continue
             
@@ -82,23 +87,23 @@ def expandParentheses(equation):
                 # Текущая компонента - неизвестное (типо "x" или "2x" и т.д.)
                 
                 # Перемножим с тем что за скобкой и добавим в результат    
-                r += str_plus(a.value * c.factor_value * s, start, True) + c.value
+                r += str_plus(a.value * c.factor_value * s * sp, start, True) + c.value
                 
             elif c.type == EquationComponentType.Number: 
                 # Текущая компонента - число
                 
                 # Перемножим с тем что за скобкой и добавим в результат  
                 if a.type == EquationComponentType.Unknown:                 
-                    r += str_plus(a.factor_value * c.value * s, start, True) + a.value
+                    r += str_plus(a.factor_value * c.value * s * sp, start, True) + a.value
                 elif c.type == EquationComponentType.Number:                    
-                    r += str_plus(a.value * c.value * s, start)  
+                    r += str_plus(a.value * c.value * s * sp, start)  
                     
         else:
             # Мы вне скобок
             
             if c.type == EquationComponentType.Unknown or c.type == EquationComponentType.Number: 
                 # Тип компоненты неизвестное или число
-                
+                            
                 # Проверим нет ли скобки после компонента
                 if c.as_factor == True:
                 
@@ -126,20 +131,19 @@ def expandParentheses(equation):
                         r += str_plus(c.value * s, start)
 
 
-        if c.type == EquationComponentType.Operation:
-        
+        if c.type == EquationComponentType.Operation:     
             # Сохраняем знак
             if c.value == '-': 
                 s = -1
             else:
                 s = 1 
-                
-            # После любого действия это уже не начало выражения
+         
+        elif (c.type == EquationComponentType.Unknown or c.type == EquationComponentType.Number) \
+              and c.as_factor == False:            
+            # После числа или неизвестного, которое стоит не перед скобкой, уже не начало выражения
             start = False
-            
-            
-        if c.value == '=':
-        
+          
+        elif c.value == '=':
             # После "=" Вновь начало выражения
             start = True  
             
@@ -173,6 +177,8 @@ def needMove(equation):
     
 # Пометить элементы для переноса
 def markMoveElements(equation):
+    
+    # В 'a' будем помещать компонент для знака перед числом, по умолчанию присвоим пустой компонент
     a = EquationComponent(0)
     # Для левой части
     for c in equation.left():
@@ -183,6 +189,8 @@ def markMoveElements(equation):
         elif c.type == EquationComponentType.Operation:        
             a = c
             
+    # В 'a' будем помещать компонент для знака перед числом, по умолчанию присвоим пустой компонент
+    a = EquationComponent(0)            
     # Для правой части
     for c in equation.rigth():
         if c.type == EquationComponentType.Unknown:
@@ -323,7 +331,11 @@ def simplificationElements(equation):
             else:
                 s = 1 
         else:
-            rr += c.value * s            
+            rr += c.value * s 
+
+    if rl == 0:
+        # Уравнение не имеет корней
+        return False
    
     # Вернем полученное уравнение, соединив левую и правую часть
     return str_plus(rl, True, True) + equation.unknown + "=" + str_plus(rr, True, False)
