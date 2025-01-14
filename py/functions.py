@@ -60,6 +60,7 @@ def expandParentheses(equation):
         
         # Проверяем скобки    
         if c.value == '(':
+            # Выставим флаг, что мы внутри скобки
             b = True
             # Сохраним знак перед скобками
             sp = s
@@ -69,16 +70,14 @@ def expandParentheses(equation):
             continue
             
         if c.value == ')':
+            # Снимем флаг что мы внутри скобок
             b = False
-            
             # Сбросим компонент
             a = EquationComponent(1)
-            
             # К следующему компоненту уравнения
             continue
             
-            
-        
+
         # Мы внутри скобок?
         if b == True:
             # Да, внутри скобок
@@ -146,10 +145,8 @@ def expandParentheses(equation):
         elif c.value == '=':
             # После "=" Вновь начало выражения
             start = True  
-            
             # После "=" сбрасываем знак в "+"
-            s = 1 
-            
+            s = 1    
             # Добавим "=" в результат
             r += "="
     
