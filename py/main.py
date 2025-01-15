@@ -44,7 +44,6 @@ def do(e):
         alert("Ошибка в уравнении")
         return
     
-    console.log(result)
     if result != True:            
         # Нужно проверить результат
         if not eq.isSame(result):
@@ -185,7 +184,6 @@ def do(e):
         
         # Кнопка "Далее" не нужна более
         button_do.hide()      
-        
         
     # Проверим результат на существование корней
     if result == False:

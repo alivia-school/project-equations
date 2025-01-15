@@ -48,8 +48,6 @@ def expandParentheses(equation):
     s = 1
     # Знак перед скобками
     sp = 1    
-    # Компонент перед скобкой
-    a = EquationComponent(1)
     # Флаг: Внутри скобок или нет
     b = False
     # Флаг: Начало выражения
@@ -72,8 +70,6 @@ def expandParentheses(equation):
         if c.value == ')':
             # Снимем флаг что мы внутри скобок
             b = False
-            # Сбросим компонент
-            a = EquationComponent(1)
             # К следующему компоненту уравнения
             continue
             
@@ -90,11 +86,10 @@ def expandParentheses(equation):
                 
             elif c.type == EquationComponentType.Number: 
                 # Текущая компонента - число
-                
                 # Перемножим с тем что за скобкой и добавим в результат  
                 if a.type == EquationComponentType.Unknown:                 
                     r += str_plus(a.factor_value * c.value * s * sp, start, True) + a.value
-                elif c.type == EquationComponentType.Number:                    
+                elif a.type == EquationComponentType.Number:                    
                     r += str_plus(a.value * c.value * s * sp, start)  
                     
         else:
@@ -105,16 +100,8 @@ def expandParentheses(equation):
                             
                 # Проверим нет ли скобки после компонента
                 if c.as_factor == True:
-                
                     # Сохраним компонент, на него что будем умножать внутри скобок
-                    a = EquationComponent(c)
-                    # Добавим знак 
-                    if a.type == EquationComponentType.Unknown: 
-                        a.factor_value *= s                      
-                    elif a.type == EquationComponentType.Number: 
-                        a.value *= s
-                    # Сбросим знак на плюс
-                    s = 1
+                    a = c
                     
                 else:    
                     # Добавим компонент в результат    
