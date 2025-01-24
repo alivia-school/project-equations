@@ -52,6 +52,8 @@ def expandParentheses(equation):
     b = False
     # Флаг: Начало выражения
     start = True
+    #Элемент перед скобкой. По умолчанию = 1
+    a = EquationComponent(1)
     
     # Обходим все компоненты уравнения
     for c in equation.components:       
@@ -70,6 +72,8 @@ def expandParentheses(equation):
         if c.value == ')':
             # Снимем флаг что мы внутри скобок
             b = False
+            #Сбросим элемент перед скобкой. По умолчанию = 1
+            a = EquationComponent(1)
             # К следующему компоненту уравнения
             continue
             
@@ -137,14 +141,13 @@ def expandParentheses(equation):
             # Добавим "=" в результат
             r += "="
     
-    
     # Вернем результат
     return r
 
 
 # Проверка нужен ли перенос элементов в уравнении
 def needMove(equation):
-    # Проверим левую чась
+    # Проверим левую часть
     for c in equation.left():        
         if c.type == EquationComponentType.Number:
             # Если есть числа слева, то перенос нужен
