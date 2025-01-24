@@ -18,11 +18,15 @@ body {
 
 .bry__simpleequation {
     --placeholder: "Введите уравнение";
-    --notice-error: "Уравнение содержит ошибку";
+    --notice-error: "Уравнение содержит ошибку. Используйте только латинские буквы, цифры и знаки + - = ( )";
     
     width: 90%;
     margin-left: auto;
     margin-right: auto; 
+}
+
+.bry__simpleequation:not(.read-only) {
+    margin-bottom: 70px;	
 }
 
 .bry__control_label {
