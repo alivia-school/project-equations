@@ -26,7 +26,7 @@ body {
 }
 
 .bry__simpleequation:not(.read-only) {
-    margin-bottom: 70px;	
+    margin-bottom: calc(70px* var(--scale, 1));	
 }
 
 .bry__control_label {
